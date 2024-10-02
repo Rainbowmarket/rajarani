@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDatabase, set, ref, get } from 'firebase/database';
-import app from '../firebase/db';
+import app from '../firebase/connection';
 
 const db = getDatabase(app);
 
