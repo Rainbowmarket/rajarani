@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDatabase, set, ref, get } from 'firebase/database';
 import app from '../firebase/connection';
+import '../style/createGroup.css';
 
 const db = getDatabase(app);
 
@@ -83,9 +84,9 @@ const CreateGroup = () => {
                             const updatedUsers = users.map((user, index) => ({
                                 ...user,
                                 position: shuffledRoles[index],
-                                action: shuffledRoles[index]==="Raja",
-                                role: shuffledRoles[index]==="Raja",
-                                id:index
+                                action: shuffledRoles[index] === "Raja",
+                                role: shuffledRoles[index] === "Raja",
+                                id: index
                             }));
                             set(ref(db, `RajaRaniGame/${new Date().toISOString().split('T')[0]}/G${groupId.toString()}`), {
                                 ...updatedUsers
@@ -101,7 +102,13 @@ const CreateGroup = () => {
                 .catch((error) => {
                     console.error("Error fetching data:", error);
                 });
-            navigate(`/Group/${groupId}/${username}`);
+            if (users.length < 4) {
+                alert("Minimum 4 players required");
+            } else if (users.length > 7) {
+                alert("Maximum 7 players can play");
+            } else {
+                navigate(`/Group/${groupId}/${username}`);
+            }
         } else {
             alert("Please generate a group ID first.");
         }
@@ -110,61 +117,6 @@ const CreateGroup = () => {
 
     return (
         <div>
-            <style>
-                {`
-                    div {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        height: 100vh;
-                        background-color: #f0f4f7;
-                        font-family: Arial, sans-serif;
-                    }
-
-                    h1, h2 {
-                        color: #333;
-                    }
-
-                    button {
-                        padding: 10px 20px;
-                        margin: 10px;
-                        background-color: #4caf50;
-                        color: white;
-                        border: none;
-                        border-radius: 5px;
-                        font-size: 16px;
-                        cursor: pointer;
-                        transition: background-color 0.3s ease;
-                    }
-
-                    button:hover {
-                        background-color: #45a049;
-                    }
-
-                    button:disabled {
-                        background-color: #ccc;
-                        cursor: not-allowed;
-                    }
-
-                    ul {
-                        list-style-type: none;
-                        padding: 0;
-                        margin-top: 20px;
-                    }
-
-                    li {
-                        background-color: #f9f9f9;
-                        padding: 10px;
-                        margin: 5px;
-                        border-radius: 5px;
-                        border: 1px solid #ddd;
-                        width: 300px;
-                        text-align: center;
-                    }
-                `}
-            </style>
-
             <h1>Group Id: {groupId ? groupId : "No ID generated"}</h1>
             <button onClick={createGroupId} disabled={isCreated}>Generate Group Id</button>
             <h2>Users in Group:</h2>

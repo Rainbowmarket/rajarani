@@ -16,6 +16,8 @@ const StartGame = () => {
   const [error, setError] = useState(null);
   const tableRef = useRef(null);
   const [isclick, setIsclick] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [coins, setCoins] = useState(1000);
 
   useEffect(() => {
     // if (username !== localStorage.getItem('username')) {
@@ -92,67 +94,96 @@ const StartGame = () => {
   }, [players]);
 
   const handleClick = async (player, user) => {
+    setIsclick(false);
     const gameRole = {
       4: ["Raja", "Rani", "Police", "Thief"],
       5: ["Raja", "Rani", "Ministry", "Police", "Thief"],
       6: ["Raja", "Rani", "Ministry", "Police", "Thief1", "Thief2"],
       7: ["Raja", "Rani", "Ministry", "Police", "Thief1", "Thief2", "Thief3"]
     };
-    confetti();
+
     const getCurrentGameRole = gameRole[players.length + 1];
     try {
       const today = new Date().toISOString().split('T')[0];
       const userPositionIndex = getCurrentGameRole.indexOf(user.position);
-      
+
       if (player.position === getCurrentGameRole[userPositionIndex + 1]) {
         const userRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`);
         await update(userRef, { action: false });
         const playerRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`);
         await update(playerRef, { action: true, role: true });
+        setCoins(1000);
       }
-      else{
+      else if (player.role === 1) {
         const userRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`);
-        await update(userRef, { name: player.name});
+        await update(userRef, { name: player.name });
         const playerRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`);
         await update(playerRef, { name: user.name });
+      }else{
+        setCoins(10);
       }
       const snapshot = await get(ref(db, `RajaRaniGame/${today}/G${gameId}`));
 
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const playersArray = Object.values(data);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const playersArray = Object.values(data);
 
-          const playersObject = playersArray.filter(player => player.name !== username);
-          setPlayers(playersObject);
+        const playersObject = playersArray.filter(player => player.name !== username);
+        setPlayers(playersObject);
 
-          const userObject = playersArray.find(player => player.name === username);
-          if (userObject) {
-            setUser(userObject);
-          }
-          const isUsernameInActionOne = playersArray.find(player => player.action === true && player.name === username);
-          if (isUsernameInActionOne) {
-            setIsclick(true);
-          }
-          else {
-            setIsclick(false);
-          }
-        } else {
-          setError('No players found for this group.');
+        const userObject = playersArray.find(player => player.name === username);
+        if (userObject) {
+          setUser(userObject);
         }
+        const isUsernameInActionOne = playersArray.find(player => player.action === true && player.name === username);
+        if (isUsernameInActionOne) {
+          setIsclick(true);
+        }
+        else {
+          setIsclick(false);
+        }
+      } else {
+        setError('No players found for this group.');
+      }
     } catch (error) {
       alert(error);
     }
+    confetti({
+      particleCount: 300,
+      spread: 150,
+      origin: { y: 0.8 },
+      shapes: ['circle', 'square'],
+      gravity: 0.6,
+      scalar: 2.0,
+      ticks: 300
+    });
+    setTimeout(() => {
+      setShowPopup(true);
+    }, 2000);
   };
-
+  const closePopup = () => {
+    setShowPopup(false);
+  };
   return (
     <div className="table-container" ref={tableRef}>
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h2>Congratulations!</h2>
+            <p>You did it! 🎉</p>
+            <p>{coins} coins</p>
+            <button onClick={closePopup}>Close</button>
+          </div>
+        </div>
+      )}
       <div className="table"></div>
       {error && <div className="error-message">{error}</div>}
+
       {user && (
         <div
           key={user.id}
           className="user-center"
-          // onClick={isclick ? () => handleClick(user.id) : null}
+        // onClick={isclick ? () => handleClick(user.id) : null}
         >
           <div className="profile-pic">
             <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${user.name} profile`} />
