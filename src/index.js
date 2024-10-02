@@ -8,6 +8,7 @@ import CreateGroup from './screen/creategroup';
 import JoinGroup from './screen/joingroup';
 import StartGame from './screen/startgame';
 import SignIn from './screen/signin';
+import OvelTable from './test';
 // import { GoogleAuthProvider } from 'firebase/auth/web-extension';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -21,6 +22,7 @@ root.render(
         <Route path="/CreateGroup" element={<CreateGroup />} />
         <Route path="/joingroup" element={<JoinGroup />} />
         <Route path="/Group/:id/:username" element={<StartGame />} />
+        <Route path='test' element={<OvelTable />} />
       </Routes>
     </Router>
     {/* </GoogleAuthProvider> */}

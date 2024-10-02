@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getDatabase, ref, get, update } from 'firebase/database';
 import app from '../firebase/connection';
 import '../style/StartGame.css';
+import confetti from 'canvas-confetti';
 
 const db = getDatabase(app);
 
@@ -55,7 +56,7 @@ const StartGame = () => {
 
     fetchPlayers(); // Initial fetch
 
-    const intervalId = setInterval(fetchPlayers, 5000); // Fetch every 5 seconds
+    const intervalId = setInterval(fetchPlayers, 3000); // Fetch every 5 seconds
 
     return () => clearInterval(intervalId); // Clean up the interval on unmount
   }, [username, navigate, gameId]);
@@ -97,6 +98,7 @@ const StartGame = () => {
       6: ["Raja", "Rani", "Ministry", "Police", "Thief1", "Thief2"],
       7: ["Raja", "Rani", "Ministry", "Police", "Thief1", "Thief2", "Thief3"]
     };
+    confetti();
     const getCurrentGameRole = gameRole[players.length + 1];
     try {
       const today = new Date().toISOString().split('T')[0];
