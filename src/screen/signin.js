@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth, provider } from "../firebase/connection";
+import { signInWithPopup } from "firebase/auth";
 import styles from '../style/SignIn.module.css';
 
 const SignIn = () => {
@@ -18,6 +20,18 @@ const SignIn = () => {
       setErrorMessage('');
       localStorage.setItem('username', username);
       navigate('/');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      localStorage.setItem('username', user.displayName);
+      navigate('/');
+    } catch (error) {
+      console.error("Error during sign-in:", error);
+      setErrorMessage("Google sign-in failed. Please try again.");
     }
   };
 
@@ -54,6 +68,12 @@ const SignIn = () => {
 
         <button type="submit" className={styles.signinButton}>Sign In</button>
       </form>
+
+      <div className={styles.googleSignInWrapper}>
+        <button onClick={handleGoogleSignIn} className={styles.googleSignInButton}>
+          Sign in with Google
+        </button>
+      </div>
     </div>
   );
 };

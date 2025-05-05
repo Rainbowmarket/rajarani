@@ -4,12 +4,18 @@ import { getDatabase, ref, get, update } from 'firebase/database';
 import app from '../firebase/connection';
 import confetti from 'canvas-confetti';
 import styles from '../style/StartGame.module.css';
+import navStyles from '../style/nav.module.css';
+import { auth } from '../firebase/connection';
+import { signOut } from 'firebase/auth';
 
 const db = getDatabase(app);
 
 const StartGame = () => {
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const username = localStorage.getItem('username');
   const navigate = useNavigate();
-  const { id: gameId, username } = useParams();
+  const { id: gameId } = useParams();
   const [players, setPlayers] = useState([]);
   const [user, setUser] = useState(null);
   const [positions, setPositions] = useState([]);
@@ -19,6 +25,15 @@ const StartGame = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [coins, setCoins] = useState(1000);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem('username');
+      navigate('/signin');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
@@ -135,55 +150,75 @@ const StartGame = () => {
   };
 
   return (
-    <div className={styles.tableContainer} ref={tableRef}>
-      {showPopup && (
-        <div className={styles.popupOverlay}>
-          <div className={styles.popupContent}>
-            <h2>Congratulations!</h2>
-            <p>You did it! 🎉</p>
-            <p>{coins} coins</p>
-            <button onClick={() => setShowPopup(false)}>Close</button>
+    <>
+      <nav className={navStyles.navbar}>
+        <div className={navStyles.navLeft}>Raja Rani</div>
+        <div className={navStyles.navRight}>
+          <div className={navStyles.profileWrapper} onClick={() => setShowDropdown(!showDropdown)}>
+            <img
+              src="https://www.gravatar.com/avatar?d=mp&s=40"
+              alt="Profile"
+              className={navStyles.profileImage}
+            />
+            {showDropdown && (
+              <div className={navStyles.dropdownMenu}>
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </nav>
+      <div className={styles.tableContainer} ref={tableRef}>
 
-      {error && <div className="error-message">{error}</div>}
-
-      {user && (
-        <div className={styles.userCenter}>
-          <div className={styles.profilePic}>
-            <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${user.name} profile`} />
-          </div>
-          <div className={styles.playerInfo}>
-            <div className={styles.playerName}>{`${user.name} (You)`}</div>
-            <div className={styles.playerContent}>{user.position}</div>
-          </div>
-        </div>
-      )}
-
-      {players.map((player, index) => (
-        <div
-          key={player.id}
-          className={styles.player}
-          style={{
-            left: `${positions[index]?.x}px`,
-            top: `${positions[index]?.y}px`,
-            cursor: isclick ? "pointer" : "default"
-          }}
-          onClick={isclick ? () => handleClick(player, user) : null}
-        >
-          <div className={styles.profilePic}>
-            <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${player.name} profile`} />
-          </div>
-          <div className={styles.playerInfo}>
-            <div className={styles.playerName}>{player.name}</div>
-            <div className={styles.playerContent}>
-              {player.role ? player.position : player.name === username ? player.position : "******"}
+        {showPopup && (
+          <div className={styles.popupOverlay}>
+            <div className={styles.popupContent}>
+              <h2>Congratulations!</h2>
+              <p>You did it! 🎉</p>
+              <p>{coins} coins</p>
+              <button onClick={() => setShowPopup(false)}>Close</button>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        )}
+
+        {error && <div className="error-message">{error}</div>}
+
+        {user && (
+          <div className={styles.userCenter}>
+            <div className={styles.profilePic}>
+              <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${user.name} profile`} />
+            </div>
+            <div className={styles.playerInfo}>
+              <div className={styles.playerName}>{`${user.name} (You)`}</div>
+              <div className={styles.playerContent}>{user.position}</div>
+            </div>
+          </div>
+        )}
+
+        {players.map((player, index) => (
+          <div
+            key={player.id}
+            className={styles.player}
+            style={{
+              left: `${positions[index]?.x}px`,
+              top: `${positions[index]?.y}px`,
+              cursor: isclick ? "pointer" : "default"
+            }}
+            onClick={isclick ? () => handleClick(player, user) : null}
+          >
+            <div className={styles.profilePic}>
+              <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${player.name} profile`} />
+            </div>
+            <div className={styles.playerInfo}>
+              <div className={styles.playerName}>{player.name}</div>
+              <div className={styles.playerContent}>
+                {player.role ? player.position : player.name === username ? player.position : "******"}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 

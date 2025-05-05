@@ -13,11 +13,28 @@ const firebaseConfig = {
   databaseURL: "https://rajarani-2024-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
+// const firebaseConfig = {
+//   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+//   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+//   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+//   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+//   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+//   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+//   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+//   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+// };
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+const analytics = getAnalytics(app);
+
+// Auth setup
+const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-provider.addScope('http://localhost:3000/');
+provider.addScope('https://www.googleapis.com/auth/userinfo.email');
+provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
 auth.useDeviceLanguage();
+
+// Export
 export default app;
-export {auth, provider, getAnalytics}
+export { auth, provider, analytics };

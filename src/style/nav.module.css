@@ -1,0 +1,47 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #222;
+    color: #fff;
+  }
+  
+  .navLeft {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .navRight {
+    position: relative;
+  }
+  
+  .profileWrapper {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profileImage {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .dropdownMenu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+  }
+  
+  .dropdownMenu button {
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+  }
+  
