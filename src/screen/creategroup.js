@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDatabase, set, ref, get } from 'firebase/database';
 import app from '../firebase/connection';
-import '../style/createGroup.css';
+import styles from '../style/CreateGroup.module.css';
 
 const db = getDatabase(app);
 
@@ -25,10 +25,10 @@ const CreateGroup = () => {
                 role: 0
             }
         });
-    }
+    };
+
     useEffect(() => {
         let intervalId;
-
         if (groupId && isCreated) {
             const fetchUsers = () => {
                 get(ref(db, `RajaRaniGame/${new Date().toISOString().split('T')[0]}/G${groupId}`))
@@ -114,23 +114,21 @@ const CreateGroup = () => {
         }
     };
 
-
     return (
-        <div>
-            <h1>Group Id: {groupId ? groupId : "No ID generated"}</h1>
-            <button onClick={createGroupId} disabled={isCreated}>Generate Group Id</button>
-            <h2>Users in Group:</h2>
+        <div className={styles.container}>
+            <h1 className={styles.title}>Group Id: {groupId ? groupId : "No ID generated"}</h1>
+            <button className={styles.button} onClick={createGroupId} disabled={isCreated}>Generate Group Id</button>
+            <h2 className={styles.subtitle}>Users in Group:</h2>
             {users.length > 0 ? (
-                <ul>
+                <ul className={styles.userList}>
                     {users.map((user, index) => (
-                        <li key={index}>{user.name}</li>
+                        <li key={index} className={styles.userItem}>{user.name}</li>
                     ))}
                 </ul>
             ) : (
                 <p>No users in this group yet.</p>
             )}
-
-            <button onClick={handleCreateGroup} disabled={!groupId}>Start Match</button>
+            <button className={styles.button} onClick={handleCreateGroup} disabled={!groupId}>Start Match</button>
         </div>
     );
 };

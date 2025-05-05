@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getDatabase, ref, get, update } from 'firebase/database';
 import app from '../firebase/connection';
-import '../style/StartGame.css';
 import confetti from 'canvas-confetti';
+import styles from '../style/StartGame.module.css';
 
 const db = getDatabase(app);
 
@@ -20,10 +20,6 @@ const StartGame = () => {
   const [coins, setCoins] = useState(1000);
 
   useEffect(() => {
-    // if (username !== localStorage.getItem('username')) {
-    //   navigate('/signin');
-    // }
-
     const fetchPlayers = async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
@@ -37,16 +33,10 @@ const StartGame = () => {
           setPlayers(playersObject);
 
           const userObject = playersArray.find(player => player.name === username);
-          if (userObject) {
-            setUser(userObject);
-          }
+          if (userObject) setUser(userObject);
+
           const isUsernameInActionOne = playersArray.find(player => player.action === true && player.name === username);
-          if (isUsernameInActionOne) {
-            setIsclick(true);
-          }
-          else {
-            setIsclick(false);
-          }
+          setIsclick(!!isUsernameInActionOne);
         } else {
           setError('No players found for this group.');
         }
@@ -56,17 +46,14 @@ const StartGame = () => {
       }
     };
 
-    fetchPlayers(); // Initial fetch
-
-    const intervalId = setInterval(fetchPlayers, 3000); // Fetch every 5 seconds
-
-    return () => clearInterval(intervalId); // Clean up the interval on unmount
+    fetchPlayers();
+    const intervalId = setInterval(fetchPlayers, 3000);
+    return () => clearInterval(intervalId);
   }, [username, navigate, gameId]);
 
   useEffect(() => {
     const calculatePositions = () => {
       if (!tableRef.current) return;
-
       const numPlayers = players.length;
       const tableWidth = tableRef.current.clientWidth / 2;
       const tableHeight = tableRef.current.clientHeight / 2;
@@ -76,7 +63,6 @@ const StartGame = () => {
       const playerPositions = players.map((_, index) => {
         const angle = (index / numPlayers) * 360;
         const radians = (angle * Math.PI) / 180;
-
         const x = centerX + tableWidth * Math.cos(radians);
         const y = centerY + tableHeight * Math.sin(radians) + 10;
         return { x, y };
@@ -89,7 +75,6 @@ const StartGame = () => {
       calculatePositions();
       window.addEventListener('resize', calculatePositions);
     }
-
     return () => window.removeEventListener('resize', calculatePositions);
   }, [players]);
 
@@ -103,51 +88,37 @@ const StartGame = () => {
     };
 
     const getCurrentGameRole = gameRole[players.length + 1];
+
     try {
       const today = new Date().toISOString().split('T')[0];
       const userPositionIndex = getCurrentGameRole.indexOf(user.position);
 
       if (player.position === getCurrentGameRole[userPositionIndex + 1]) {
-        const userRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`);
-        await update(userRef, { action: false });
-        const playerRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`);
-        await update(playerRef, { action: true, role: true });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`), { action: false });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`), { action: true, role: true });
         setCoins(1000);
-      }
-      else if (player.role === 1) {
-        const userRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`);
-        await update(userRef, { name: player.name });
-        const playerRef = ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`);
-        await update(playerRef, { name: user.name });
-      }else{
+      } else if (player.role === 1) {
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`), { name: player.name });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`), { name: user.name });
+      } else {
         setCoins(10);
       }
-      const snapshot = await get(ref(db, `RajaRaniGame/${today}/G${gameId}`));
 
+      const snapshot = await get(ref(db, `RajaRaniGame/${today}/G${gameId}`));
       if (snapshot.exists()) {
         const data = snapshot.val();
         const playersArray = Object.values(data);
-
-        const playersObject = playersArray.filter(player => player.name !== username);
-        setPlayers(playersObject);
-
+        setPlayers(playersArray.filter(player => player.name !== username));
         const userObject = playersArray.find(player => player.name === username);
-        if (userObject) {
-          setUser(userObject);
-        }
-        const isUsernameInActionOne = playersArray.find(player => player.action === true && player.name === username);
-        if (isUsernameInActionOne) {
-          setIsclick(true);
-        }
-        else {
-          setIsclick(false);
-        }
+        if (userObject) setUser(userObject);
+        setIsclick(playersArray.some(player => player.action === true && player.name === username));
       } else {
         setError('No players found for this group.');
       }
     } catch (error) {
       alert(error);
     }
+
     confetti({
       particleCount: 300,
       spread: 150,
@@ -157,63 +128,56 @@ const StartGame = () => {
       scalar: 2.0,
       ticks: 300
     });
+
     setTimeout(() => {
       setShowPopup(true);
     }, 2000);
   };
-  const closePopup = () => {
-    setShowPopup(false);
-  };
+
   return (
-    <div className="table-container" ref={tableRef}>
+    <div className={styles.tableContainer} ref={tableRef}>
       {showPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className={styles.popupOverlay}>
+          <div className={styles.popupContent}>
             <h2>Congratulations!</h2>
             <p>You did it! 🎉</p>
             <p>{coins} coins</p>
-            <button onClick={closePopup}>Close</button>
+            <button onClick={() => setShowPopup(false)}>Close</button>
           </div>
         </div>
       )}
-      <div className="table"></div>
+
       {error && <div className="error-message">{error}</div>}
 
       {user && (
-        <div
-          key={user.id}
-          className="user-center"
-        // onClick={isclick ? () => handleClick(user.id) : null}
-        >
-          <div className="profile-pic">
+        <div className={styles.userCenter}>
+          <div className={styles.profilePic}>
             <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${user.name} profile`} />
           </div>
-          <div className="player-info">
-            <div className="player-name">{`${user.name} (You)`}</div>
-            <div className="player-content">{user.position}</div>
+          <div className={styles.playerInfo}>
+            <div className={styles.playerName}>{`${user.name} (You)`}</div>
+            <div className={styles.playerContent}>{user.position}</div>
           </div>
         </div>
       )}
+
       {players.map((player, index) => (
         <div
           key={player.id}
-          className="player"
+          className={styles.player}
           style={{
-            position: 'absolute',
             left: `${positions[index]?.x}px`,
             top: `${positions[index]?.y}px`,
             cursor: isclick ? "pointer" : "default"
           }}
           onClick={isclick ? () => handleClick(player, user) : null}
         >
-          <div className="profile-pic">
+          <div className={styles.profilePic}>
             <img src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png" alt={`${player.name} profile`} />
           </div>
-          <div className="player-info">
-            <div className="player-name">
-              {player.name}
-            </div>
-            <div className="player-content">
+          <div className={styles.playerInfo}>
+            <div className={styles.playerName}>{player.name}</div>
+            <div className={styles.playerContent}>
               {player.role ? player.position : player.name === username ? player.position : "******"}
             </div>
           </div>
