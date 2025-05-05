@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from '../style/CreateGroupOrJoinGroup.module.css';
 
 const CreateGroupOrJoinGroup = () => {
     const navigate = useNavigate();
@@ -7,7 +8,7 @@ const CreateGroupOrJoinGroup = () => {
     useEffect(() => {
         const username = localStorage.getItem('username');
         if (!username) {
-            navigate('/signin'); // Redirect to sign-in page if username is not found
+            navigate('/signin');
         }
     }, [navigate]);
 
@@ -19,39 +20,15 @@ const CreateGroupOrJoinGroup = () => {
         navigate('/JoinGroup');
     };
 
-    const buttonStyle = {
-        padding: '10px 20px',
-        margin: '10px',
-        fontSize: '16px',
-        backgroundColor: '#4caf50',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-    };
-
-    const containerStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: '#f0f4f7',
-    };
-
-    const headingStyle = {
-        marginBottom: '20px',
-    };
-
     return (
-        <div style={containerStyle}>
-            <h1 style={headingStyle}>Raja Rani Game</h1>
-            <h2 style={headingStyle}>Choose an Option</h2>
-            <button style={buttonStyle} onClick={handleCreateGroup}>Create Group</button>
+        <div className={styles.container}>
+            <h1 className={styles.heading}>Raja Rani Game</h1>
+            <h2 className={styles.heading}>Choose an Option</h2>
+            <button className={styles.button} onClick={handleCreateGroup}>Create Group</button>
             <p>or</p>
-            <button style={buttonStyle} onClick={handleJoinGroup}>Join Group</button>
+            <button className={styles.button} onClick={handleJoinGroup}>Join Group</button>
             {/* <p>or</p>
-            <button style={buttonStyle} onClick={handleJoinGroup}>Auto Play</button> */}
+            <button className={styles.button} onClick={handleJoinGroup}>Auto Play</button> */}
         </div>
     );
 };
