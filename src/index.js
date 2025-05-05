@@ -18,12 +18,7 @@ const router = createBrowserRouter(
     { path: "/CreateGroup", element: <CreateGroup /> },
     { path: "/joingroup", element: <JoinGroup /> },
     { path: "/Group/:id/:username", element: <StartGame /> },
-  ],
-  {
-    future: {
-      v7_startTransition: true,
-    },
-  }
+  ]
 );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
