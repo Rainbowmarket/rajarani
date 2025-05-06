@@ -1,22 +1,37 @@
 .signinContainer {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
+  background: linear-gradient(to right, #667eea, #764ba2);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.heading {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.error {
+  color: #ffdddd;
+  background: #ff4d4d;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
 }
 
 .signinForm {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
   width: 100%;
   max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;  /* Ensures space between form fields and button */
-  height: 400px;  /* Adjust height as needed */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .formGroup {
@@ -24,52 +39,62 @@
 }
 
 .label {
-  font-size: 14px;
+  display: block;
   margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
 }
 
 .input {
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.input:focus {
+  border-color: #764ba2;
+  outline: none;
 }
 
 .signinButton {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
+  width: 100%;
+  background: #764ba2;
   color: white;
   border: none;
-  border-radius: 4px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 .signinButton:hover {
-  background-color: #0056b3;
+  background: #5a3d91;
 }
 
 .googleSignInWrapper {
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  bottom: 20px; /* Adjust this value to move the button up/down */
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 20px;
   width: 100%;
+  max-width: 400px;
 }
 
 .googleSignInButton {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #4285f4;
+  width: 100%;
+  background: #4285f4;
   color: white;
   border: none;
-  border-radius: 4px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 .googleSignInButton:hover {
-  background-color: #357ae8;
+  background: #3367d6;
 }
