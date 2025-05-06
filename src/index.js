@@ -17,7 +17,7 @@ const router = createBrowserRouter(
     { path: "/signin", element: <SignIn /> },
     { path: "/CreateGroup", element: <CreateGroup /> },
     { path: "/joingroup", element: <JoinGroup /> },
-    { path: "/Group/:id/:username", element: <StartGame /> },
+    { path: "/startgame/:id", element: <StartGame /> },
   ]
 );
 

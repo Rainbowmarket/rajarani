@@ -98,3 +98,33 @@
 .googleSignInButton:hover {
   background: #3367d6;
 }
+
+.guestNameInput {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.orSeparator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  margin: 20px auto;
+  font-size: 16px;
+  color: #666;
+  border: 2px solid #ccc;
+  border-radius: 50%; /* Makes it circular */
+  background: #fff;
+}
+
+.orSeparator span {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #666;
+}

@@ -6,6 +6,7 @@ import styles from '../style/SignIn.module.css';
 
 const SignIn = () => {
   const [errorMessage, setErrorMessage] = useState('');
+  const [guestName, setGuestName] = useState(''); // State for guest name
   const navigate = useNavigate();
 
   // Google Sign-In
@@ -21,13 +22,16 @@ const SignIn = () => {
     }
   };
 
-  // Anonymous Sign-In with random guest name
+  // Anonymous Sign-In with user-provided guest name
   const handleAnonymousSignIn = async () => {
+    if (!guestName.trim()) {
+      setErrorMessage("Please enter a valid guest name.");
+      return;
+    }
+
     try {
       const result = await signInAnonymously(auth);
       const user = result.user;
-      console.log("user",user);
-      const guestName = `Guest${Math.floor(100 + Math.random() * 900)}`;
       localStorage.setItem('username', guestName);
       localStorage.setItem('userId', user.uid); // Optional: store UID
       navigate('/');
@@ -49,7 +53,18 @@ const SignIn = () => {
         </button>
       </div>
 
-      <div className={styles.googleSignInWrapper}>
+      <div className={styles.orSeparator}>
+        <span>or</span>
+      </div>
+
+      <div className={styles.guestSignInWrapper}>
+        <input
+          type="text"
+          value={guestName}
+          onChange={(e) => setGuestName(e.target.value)}
+          placeholder="Enter your guest name"
+          className={styles.guestNameInput}
+        />
         <button onClick={handleAnonymousSignIn} className={styles.googleSignInButton}>
           Continue as Guest
         </button>

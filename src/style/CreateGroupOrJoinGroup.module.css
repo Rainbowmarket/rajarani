@@ -15,11 +15,31 @@
 
 .button {
     padding: 10px 20px;
-    margin: 10px;
-    font-size: 16px;
-    background-color: #4caf50;
+    background-color: #764ba2;
     color: white;
     border: none;
     border-radius: 5px;
+    font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #5a3d91;
+}
+
+.inputButtonWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between input and button */
+    margin-top: 20px;
+}
+
+.input {
+    flex: 1; /* Makes the input take up available space */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
 }
