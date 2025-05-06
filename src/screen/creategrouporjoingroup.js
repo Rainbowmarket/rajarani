@@ -28,6 +28,21 @@ const CreateGroupOrJoinGroup = () => {
     }
   }, [navigate]);
 
+  const gameRole = {
+    4: ["Raja", "Rani", "Police", "Thief"],
+    5: ["Raja", "Rani", "Ministry", "Police", "Thief"],
+    6: ["Raja", "Rani", "Ministry", "Police", "Thief1", "Thief2"],
+    7: ["Raja", "Rani", "Ministry", "Police", "Thief1", "Thief2", "Thief3"]
+  };
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   useEffect(() => {
     if (!groupId) return;
     const groupPath = `RajaRaniGame/${new Date().toISOString().split('T')[0]}/G${groupId}`;
@@ -85,11 +100,31 @@ const CreateGroupOrJoinGroup = () => {
   const handleStartGame = () => {
     const groupPath = `RajaRaniGame/${new Date().toISOString().split('T')[0]}/G${groupId}`;
     const groupRef = ref(db, groupPath);
-    const userMap = users.reduce((acc, user) => {
-      acc[user.name] = user;
-      return acc;
-    }, {});
-    set(groupRef, { users: userMap, gameStarted: true });
+
+    // Step 1: Count users
+    const userCount = users.length;
+
+    // Step 2: Get role list for this count
+    const roles = gameRole[userCount];
+    if (!roles) return alert("Invalid number of users for role assignment.");
+
+    // Step 3: Shuffle roles
+    const shuffledRoles = shuffleArray([...roles]);
+
+    // Step 4: Assign each user a role
+    const updatedUsers = users.map((user, index) => ({
+        ...user,
+        position: shuffledRoles[index],
+        action: shuffledRoles[index]==="Raja",
+        role: shuffledRoles[index]==="Raja",
+        id:index
+    }));
+
+    // Step 5: Update Firebase
+    set(groupRef, {
+      users: updatedUsers,
+      gameStarted: true
+    });
   };
 
   return (
@@ -112,7 +147,7 @@ const CreateGroupOrJoinGroup = () => {
         <h1 className={styles.heading}>Raja Rani Game</h1>
 
         {/* Input and Buttons */}
-        {!gameStarted && !isHost && !isJoin &&(
+        {!gameStarted && !isHost && !isJoin && (
           <>
             <div className={styles.inputButtonWrapper}>
               <input

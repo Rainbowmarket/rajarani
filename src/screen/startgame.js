@@ -42,7 +42,10 @@ const StartGame = () => {
 
         if (snapshot.exists()) {
           const data = snapshot.val();
-          const playersArray = Object.values(data);
+          console.log(data.users);
+
+          const playersArray = Object.values(data.users);
+          console.log(playersArray);
 
           const playersObject = playersArray.filter(player => player.name !== username);
           setPlayers(playersObject);
