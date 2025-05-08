@@ -11,7 +11,9 @@ import { signOut } from 'firebase/auth';
 const db = getDatabase(app);
 
 const StartGame = () => {
-
+  const [time, setTime] = useState(60);
+  const [isHideTime, setIsHideTime] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const username = localStorage.getItem('username');
   const navigate = useNavigate();
@@ -24,6 +26,31 @@ const StartGame = () => {
   const [isclick, setIsclick] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [coins, setCoins] = useState(1000);
+  useEffect(() => {
+    let interval = null;
+
+    if (isActive && time > 0) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (time === 0) {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [isActive, time]);
+  const startCountdown = () => {
+    setIsActive(true);
+  };
+
+  const stopCountdown = () => {
+    setIsActive(false);
+  };
+
+  // const resetCountdown = () => {
+  //   setIsActive(false);
+  //   setTime(60); // Reset to the initial time
+  // };
 
   const handleLogout = async () => {
     try {
@@ -114,10 +141,12 @@ const StartGame = () => {
       if (player.position === getCurrentGameRole[userPositionIndex + 1]) {
         await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${user.id}`), { action: false });
         await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${player.id}`), { action: true, role: true });
-        setCoins(1000);
+        stopCountdown();
+        setCoins((player.id + 1) * 10);
       } else if (player.role === 1) {
         await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${user.id}`), { name: player.name });
         await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${player.id}`), { name: user.name });
+        stopCountdown();
       } else {
         setCoins(10);
       }
@@ -125,11 +154,13 @@ const StartGame = () => {
       const snapshot = await get(ref(db, `RajaRaniGame/${today}/G${gameId}`));
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const playersArray = Object.values(data);
+        const playersArray = Object.values(data.users);
         setPlayers(playersArray.filter(player => player.name !== username));
         const userObject = playersArray.find(player => player.name === username);
         if (userObject) setUser(userObject);
         setIsclick(playersArray.some(player => player.action === true && player.name === username));
+        startCountdown();
+        setIsHideTime(false);
       } else {
         setError('No players found for this group.');
       }
@@ -221,6 +252,7 @@ const StartGame = () => {
           </div>
         ))}
       </div>
+      {isHideTime && <div className='timer'><h1>{time}</h1></div>}
     </>
   );
 };
