@@ -130,7 +130,7 @@ const CreateGroupOrJoinGroup = () => {
   return (
     <>
       <nav className={navStyles.navbar}>
-        <div className={navStyles.navLeft}>{username}</div>
+        <div className={navStyles.navLeft}>{username? username:"Raja Rani"}</div>
         <div className={navStyles.navRight}>
           <div onClick={() => setShowDropdown(!showDropdown)} className={navStyles.profileWrapper}>
             <img src="https://www.gravatar.com/avatar?d=mp&s=40" alt="Profile" className={navStyles.profileImage} />

@@ -112,12 +112,12 @@ const StartGame = () => {
       const userPositionIndex = getCurrentGameRole.indexOf(user.position);
 
       if (player.position === getCurrentGameRole[userPositionIndex + 1]) {
-        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`), { action: false });
-        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`), { action: true, role: true });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${user.id}`), { action: false });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${player.id}`), { action: true, role: true });
         setCoins(1000);
       } else if (player.role === 1) {
-        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${user.id}`), { name: player.name });
-        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/${player.id}`), { name: user.name });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${user.id}`), { name: player.name });
+        await update(ref(db, `RajaRaniGame/${today}/G${gameId}/users/${player.id}`), { name: user.name });
       } else {
         setCoins(10);
       }
@@ -155,7 +155,7 @@ const StartGame = () => {
   return (
     <>
       <nav className={navStyles.navbar}>
-        <div className={navStyles.navLeft}>Raja Rani</div>
+        <div className={navStyles.navLeft}>{username ? username : "Raja Rani"}</div>
         <div className={navStyles.navRight}>
           <div className={navStyles.profileWrapper} onClick={() => setShowDropdown(!showDropdown)}>
             <img
