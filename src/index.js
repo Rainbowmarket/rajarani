@@ -8,6 +8,7 @@ import {
 import CreateGroupOrJoinGroup from './screen/creategrouporjoingroup';
 import StartGame from './screen/startgame';
 import SignIn from './screen/signin';
+import './style/index.css';
 
 const router = createBrowserRouter(
   [

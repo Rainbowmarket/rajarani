@@ -23,7 +23,7 @@ def connect_ftp(server, username, password):
         print(f"Standard FTP failed: {e}")
         return None
 
-def sync_directory(ftp, local_dir, remote_dir, skip_dirs=[]):
+def sync_directory(ftp, local_dir, remote_dir, skip_dirs=[], protected_files=[]):
     if not ftp:
         print("FTP connection not established. Exiting sync.")
         return
@@ -51,10 +51,10 @@ def sync_directory(ftp, local_dir, remote_dir, skip_dirs=[]):
     local_files = os.listdir(local_dir)
     print(f"Local files: {local_files}")
 
-    # Delete remote files not in local directory
+    # Delete remote files not in local directory, excluding protected files
     for remote_file in remote_files:
         remote_path = f"{remote_dir}/{remote_file}"
-        if remote_file not in local_files:
+        if remote_file not in local_files and remote_file not in protected_files:
             try:
                 ftp.delete(remote_path)
                 print(f"Deleted remote file: {remote_path}")
@@ -76,7 +76,7 @@ def sync_directory(ftp, local_dir, remote_dir, skip_dirs=[]):
                 ftp.mkd(remote_path)
             except:
                 pass
-            sync_directory(ftp, local_path, remote_path, skip_dirs)
+            sync_directory(ftp, local_path, remote_path, skip_dirs, protected_files)
         else:
             try:
                 with open(local_path, "rb") as file:
@@ -117,10 +117,13 @@ if __name__ == "__main__":
     # List of directories to skip
     SKIP_DIRS = [".git", ".idea", ".vscode", "venv", "node_modules", "dist"]
 
+    # List of files that should NEVER be deleted from the server
+    PROTECTED_FILES = [".htaccess"]
+    
     ftp = connect_ftp(FTP_SERVER, FTP_USERNAME, FTP_PASSWORD)
     
     if ftp:
-        sync_directory(ftp, LOCAL_DIR, REMOTE_DIR, skip_dirs=SKIP_DIRS)
+        sync_directory(ftp, LOCAL_DIR, REMOTE_DIR, skip_dirs=SKIP_DIRS, protected_files=PROTECTED_FILES)
         ftp.quit()
         print("FTP connection closed.")
     else:
