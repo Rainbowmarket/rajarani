@@ -23,7 +23,7 @@ def connect_ftp(server, username, password):
         print(f"Standard FTP failed: {e}")
         return None
 
-def sync_directory(ftp, local_dir, remote_dir):
+def sync_directory(ftp, local_dir, remote_dir, skip_dirs=[]):
     if not ftp:
         print("FTP connection not established. Exiting sync.")
         return
@@ -66,16 +66,24 @@ def sync_directory(ftp, local_dir, remote_dir):
         local_path = os.path.join(local_dir, local_file)
         remote_path = f"{remote_dir}/{local_file}"
 
+        # Skip specified directories
+        if local_file in skip_dirs:
+            print(f"Skipped directory: {local_path}")
+            continue
+
         if os.path.isdir(local_path):
             try:
                 ftp.mkd(remote_path)
             except:
                 pass
-            sync_directory(ftp, local_path, remote_path)
+            sync_directory(ftp, local_path, remote_path, skip_dirs)
         else:
-            with open(local_path, "rb") as file:
-                ftp.storbinary(f"STOR {remote_path}", file)
-            print(f"Uploaded file: {remote_path}")
+            try:
+                with open(local_path, "rb") as file:
+                    ftp.storbinary(f"STOR {remote_path}", file)
+                print(f"Uploaded file: {remote_path}")
+            except Exception as e:
+                print(f"Failed to upload {remote_path}: {e}")
 
 def delete_remote_directory(ftp, remote_dir):
     try:
@@ -103,10 +111,17 @@ if __name__ == "__main__":
     FTP_USERNAME = "game@kongunattugounder.com"
     FTP_PASSWORD = r'r0oUJLDrm9sE'
     
-    LOCAL_DIR = r"E:\Development\Website's\rajarani\build"
-    REMOTE_DIR = "/build"
-    
+    LOCAL_DIR = r"E:\Development\Website's\rajarani"
+    REMOTE_DIR = "/"
+
+    # List of directories to skip
+    SKIP_DIRS = [".git", ".idea", ".vscode", "venv", "node_modules", "dist"]
+
     ftp = connect_ftp(FTP_SERVER, FTP_USERNAME, FTP_PASSWORD)
-    sync_directory(ftp, LOCAL_DIR, REMOTE_DIR)
-    ftp.quit()
-    print("FTP connection closed.")
+    
+    if ftp:
+        sync_directory(ftp, LOCAL_DIR, REMOTE_DIR, skip_dirs=SKIP_DIRS)
+        ftp.quit()
+        print("FTP connection closed.")
+    else:
+        print("FTP connection failed. Exiting.")

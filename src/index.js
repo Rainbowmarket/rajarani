@@ -6,8 +6,6 @@ import {
 } from 'react-router-dom';
 
 import CreateGroupOrJoinGroup from './screen/creategrouporjoingroup';
-import CreateGroup from './screen/creategroup';
-import JoinGroup from './screen/joingroup';
 import StartGame from './screen/startgame';
 import SignIn from './screen/signin';
 
@@ -15,8 +13,6 @@ const router = createBrowserRouter(
   [
     { path: "/", element: <CreateGroupOrJoinGroup /> },
     { path: "/signin", element: <SignIn /> },
-    { path: "/CreateGroup", element: <CreateGroup /> },
-    { path: "/joingroup", element: <JoinGroup /> },
     { path: "/startgame/:id", element: <StartGame /> },
   ]
 );
