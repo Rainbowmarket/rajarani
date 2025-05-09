@@ -2,36 +2,56 @@ from ftplib import FTP, FTP_TLS
 import os
 
 def connect_ftp(server, username, password):
+    ftp = None
     try:
-        # Try FTPS (Secure FTP)
         print("Attempting to connect using FTPS...")
-        ftp = FTP_TLS(server)
-        # ftp.set_debuglevel(2)  # Enable debug mode
-        # ftp.set_pasv(True)     # Passive mode
+        ftp = FTP_TLS(server, timeout=15)
         ftp.login(username, password)
-        ftp.prot_p()           # Secure data connection (for FTPS)
+        ftp.prot_p()  # Secure data connection for FTPS
         print("Connected using FTPS.")
         return ftp
     except Exception as e:
         print(f"FTPS failed: {e}\nFalling back to standard FTP...")
 
+    try:
+        print("Attempting to connect using standard FTP...")
+        ftp = FTP(server, timeout=15)
+        ftp.login(username, password)
+        print("Connected using standard FTP.")
+        return ftp
+    except Exception as e:
+        print(f"Standard FTP failed: {e}")
+        return None
 
 def sync_directory(ftp, local_dir, remote_dir):
+    if not ftp:
+        print("FTP connection not established. Exiting sync.")
+        return
+    
     # Change to the remote directory (create if it doesn't exist)
     try:
         ftp.cwd(remote_dir)
     except:
-        ftp.mkd(remote_dir)
-        ftp.cwd(remote_dir)
+        try:
+            ftp.mkd(remote_dir)
+            ftp.cwd(remote_dir)
+        except Exception as e:
+            print(f"Failed to create or change remote directory: {e}")
+            return
     
     # Get list of remote files
-    remote_files = ftp.nlst()
-    print(f"Remote files: {remote_files}")
+    try:
+        remote_files = ftp.nlst()
+        print(f"Remote files: {remote_files}")
+    except Exception as e:
+        print(f"Failed to list remote files: {e}")
+        remote_files = []
 
     # Get list of local files
     local_files = os.listdir(local_dir)
     print(f"Local files: {local_files}")
-    # Delete remote files that are not in local directory
+
+    # Delete remote files not in local directory
     for remote_file in remote_files:
         remote_path = f"{remote_dir}/{remote_file}"
         if remote_file not in local_files:
@@ -62,28 +82,36 @@ def delete_remote_directory(ftp, remote_dir):
         ftp.rmd(remote_dir)
         print(f"Deleted remote directory: {remote_dir}")
     except:
-        ftp.cwd(remote_dir)
-        remote_files = ftp.nlst()
-        for file in remote_files:
-            try:
-                ftp.delete(file)
-                print(f"Deleted remote file: {file}")
-            except:
-                delete_remote_directory(ftp, f"{remote_dir}/{file}")
+        try:
+            ftp.cwd(remote_dir)
+            remote_files = ftp.nlst()
+            for file in remote_files:
+                try:
+                    ftp.delete(file)
+                    print(f"Deleted remote file: {file}")
+                except:
+                    delete_remote_directory(ftp, f"{remote_dir}/{file}")
 
-        ftp.cwd("..")
-        ftp.rmd(remote_dir)
-        print(f"Deleted remote directory: {remote_dir}")
+            ftp.cwd("..")
+            ftp.rmd(remote_dir)
+            print(f"Deleted remote directory: {remote_dir}")
+        except Exception as e:
+            print(f"Failed to delete remote directory: {e}")
 
 if __name__ == "__main__":
     FTP_SERVER = "ftp.kongunattugounder.com"
     FTP_USERNAME = "game@kongunattugounder.com"
     FTP_PASSWORD = r'r0oUJLDrm9sE'
     
-    LOCAL_DIR = r"D:\Naveen\github\rajarani"
     # LOCAL_DIR = r"E:\Development\Website's\rajarani\build"
+    LOCAL_DIR = r"D:\Naveen\github\rajarani\build"
+    REMOTE_DIR = "/build"
     
     ftp = connect_ftp(FTP_SERVER, FTP_USERNAME, FTP_PASSWORD)
-    sync_directory(ftp, LOCAL_DIR, REMOTE_DIR)
-    ftp.quit()
-    print("FTP connection closed.")
+    
+    if ftp:
+        sync_directory(ftp, LOCAL_DIR, REMOTE_DIR)
+        ftp.quit()
+        print("FTP connection closed.")
+    else:
+        print("Failed to establish an FTP connection.")
