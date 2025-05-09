@@ -82,7 +82,7 @@ if __name__ == "__main__":
     
     LOCAL_DIR = r"D:\Naveen\github\rajarani"
     # LOCAL_DIR = r"E:\Development\Website's\rajarani\build"
-    
+    REMOTE_DIR = "/build"
     ftp = connect_ftp(FTP_SERVER, FTP_USERNAME, FTP_PASSWORD)
     sync_directory(ftp, LOCAL_DIR, REMOTE_DIR)
     ftp.quit()
