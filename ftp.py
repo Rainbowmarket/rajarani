@@ -81,7 +81,7 @@ if __name__ == "__main__":
     FTP_PASSWORD = r'r0oUJLDrm9sE'
     
     LOCAL_DIR = r"E:\Development\Website's\rajarani\build"
-    REMOTE_DIR = "/test/"
+    REMOTE_DIR = "/build/"
     
     ftp = connect_ftp(FTP_SERVER, FTP_USERNAME, FTP_PASSWORD)
     sync_directory(ftp, LOCAL_DIR, REMOTE_DIR)
